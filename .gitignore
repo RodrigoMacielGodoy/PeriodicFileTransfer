@@ -85,7 +85,7 @@ ipython_config.py
 .python-version
 bin/
 Scripts/
-pyenv.cfg
+pyvenv.cfg
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
@@ -133,3 +133,4 @@ dmypy.json
 
 # macOS
 .DS_Store
+

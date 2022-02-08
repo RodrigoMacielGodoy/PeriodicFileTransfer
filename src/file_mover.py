@@ -38,7 +38,7 @@ class FileMover(QObject):
         return self.__file_check_timer.isActive()
 
     def setPeriod(self, period: int) -> None:
-        self.__period = period
+        self.__period = period*1000
 
     def setDestination(self, dest: str) -> None:
         self.__destination = dest
@@ -52,6 +52,7 @@ class FileMover(QObject):
     def start(self) -> bool:
         if self.__period <= 0:
             return False
+        self.__check_files()
         self.__file_check_timer.start(self.__period)
         return True
 
@@ -88,8 +89,3 @@ class FileMover(QObject):
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.fileTransfered.emit(self.__source, self.__destination, file, now)
-
-if __name__ == "__main__":
-    fm = FileMover()
-    fm.setSource(os.path.join(os.path.expanduser("~"), "Downloads"))
-    fm.check_files()
