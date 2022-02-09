@@ -20,3 +20,17 @@ class Logger(object):
             row = ",".join([date, time, file_name, extension, src, dst])
             f.write(row+"\n\r")
             
+    def get_log(self) -> "list[list[str]]":
+        if not os.path.exists(self.__path):
+            return []
+        with open(self.__path, "r") as f:
+            file = f.read()
+
+        data = []
+        first = True
+        for line in file:
+            if first:
+                first = False # Skips the header
+                continue
+            data.append(line.split(","))
+        return data

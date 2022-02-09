@@ -5,6 +5,8 @@ from datetime import datetime
 
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
+from mover import Mover
+
 
 class FileMover(QObject):
     fileTransfered = pyqtSignal(str, str, str, str)
@@ -16,6 +18,7 @@ class FileMover(QObject):
         self.__source = ""
         self.__destination = ""
         self.__period = 0
+        self.__movers: list[Mover] = []
 
     @property
     def source(self) -> str:
@@ -60,7 +63,13 @@ class FileMover(QObject):
         if self.__file_check_timer.isActive():
             self.__file_check_timer.stop()
 
+    def close(self) -> None:
+        for mover in self.__movers:
+            mover.wait()
+
     def __check_files(self) -> None:
+        # TODO: add recursive files if settings available 
+        # (create the same tree or copy to root dst?)
         files = os.listdir(self.__source)
         for file in files:
             path = os.path.join(self.__source, file)
@@ -73,8 +82,6 @@ class FileMover(QObject):
             self.__move(file)
 
     def __move(self, file: str) -> None:
-        # TODO: make the move async, just in case the files are too
-        # large (or too many), to prevent the GUI to freeze
         if self.__source == "" or self.__destination == "":
             return
 
@@ -84,8 +91,16 @@ class FileMover(QObject):
         
         src = os.path.join(self.__source, file)
         dst = os.path.join(self.__destination, file)
+        
+        # TODO: maybe create a move method to move large files in batches 
+        # so it can be stopped, preventing application hangging on close,
+        # giving the option to cancel the move cmd and preventing corruption
+        # of files if application is forced to close.
 
-        shutil.move(src, dst)
+        self.__movers.append(Mover(src, dst, self.__emit_finished_transfer,
+                            (self.__source, self.__destination, file)))
+        self.__movers[-1].start()
 
+    def __emit_finished_transfer(self, src: str, dst: str, file: str) -> None:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.fileTransfered.emit(self.__source, self.__destination, file, now)

@@ -47,17 +47,15 @@ class MainWindow(QMainWindow):
     def __get_directory(self) -> str:
         return QFileDialog.getExistingDirectory(self, HOME_PATH)
 
+    def closeEvent(self, evt) -> None:
+        self.file_mover.stop()
+        self.file_mover.close()
+        evt.accept()
+
     def setupUI(self) -> None:
         self.ui.setupUi(self)
-
         self.ui.le_period.setValidator(QIntValidator(self.ui.le_period))
-
-        self.ui.le_file_regex.setText(self.settings.regex)
-        self.ui.le_period.setText(str(self.settings.period))
-        self.ui.lb_destination_dir.setText(self.settings.destination or "Select a directory")
-        self.ui.lb_source_dir.setText(self.settings.source or "Select a directory")
-        self.ui.cb_period_unit.setCurrentIndex(self.settings.period_unit)
-
+        self.updateUi()
         self.setupConnects()
 
     def setupConnects(self) -> None:
@@ -92,10 +90,23 @@ class MainWindow(QMainWindow):
         self.file_mover.setPeriod(self.settings.period * mult)
         self.file_mover.setRegex(self.settings.regex)
 
+    def updateUi(self) -> None:
+        self.ui.le_file_regex.setText(self.settings.regex)
+        self.ui.le_period.setText(str(self.settings.period))
+        self.ui.lb_destination_dir.setText(self.settings.destination or "Select a directory")
+        self.ui.lb_source_dir.setText(self.settings.source or "Select a directory")
+        self.ui.cb_period_unit.setCurrentIndex(self.settings.period_unit)
+
+    def update_log_table(self) -> None:
+        pass
+        #TODO: show log inside the table on the GUI
+            
+
     def swap_src_dst(self) -> None:
         self.settings.destination, self.settings.source = self.settings.source, self.settings.destination
         self.settings.save()
         self.update_file_mover()
+        self.updateUi()
 
     def source_dir_changed(self) -> None:
         path = self.__get_directory()
