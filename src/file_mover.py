@@ -9,7 +9,7 @@ from mover import Mover
 
 
 class FileMover(QObject):
-    fileTransfered = pyqtSignal(str, str, str, str)
+    fileTransfered = pyqtSignal(dict)
     def __init__(self) -> None:
         super().__init__()
         self.__file_check_timer = QTimer()
@@ -76,6 +76,7 @@ class FileMover(QObject):
             if not os.path.isfile(path):
                 continue
             match = len(re.findall(self.__regex, file)) > 0
+            
             if not match:
                 continue
 
@@ -96,11 +97,21 @@ class FileMover(QObject):
         # so it can be stopped, preventing application hangging on close,
         # giving the option to cancel the move cmd and preventing corruption
         # of files if application is forced to close.
-
-        self.__movers.append(Mover(src, dst, self.__emit_finished_transfer,
-                            (self.__source, self.__destination, file)))
+        data = {
+            "src":self.__source,
+            "dst":self.__destination,
+            "file":file,
+            "size":os.stat(src).st_size,
+            "start_time": datetime.now()
+        }
+        self.__movers.append(Mover(src, dst, self.__emit_finished_transfer, args=(data,)) )
         self.__movers[-1].start()
 
-    def __emit_finished_transfer(self, src: str, dst: str, file: str) -> None:
+    def __emit_finished_transfer(self, data: dict) -> None:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.fileTransfered.emit(self.__source, self.__destination, file, now)
+        new_data = {
+            "transfer_time": (datetime.now() - data["start_time"]).microseconds,
+            "end_time": now
+        }
+        data.update(new_data)
+        self.fileTransfered.emit(data)
