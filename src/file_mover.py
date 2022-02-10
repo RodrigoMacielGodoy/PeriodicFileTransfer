@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 import os
 import re
 import shutil
@@ -6,6 +7,7 @@ from datetime import datetime
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 from mover import Mover
+from pool_manager import PoolManager
 
 
 class FileMover(QObject):
@@ -18,7 +20,7 @@ class FileMover(QObject):
         self.__source = ""
         self.__destination = ""
         self.__period = 0
-        self.__movers: list[Mover] = []
+        self.__movers = PoolManager(Mover)
 
     @property
     def source(self) -> str:
@@ -64,8 +66,8 @@ class FileMover(QObject):
             self.__file_check_timer.stop()
 
     def close(self) -> None:
-        for mover in self.__movers:
-            mover.wait()
+        while(self.__movers.objects_in_use > 0):
+            pass
 
     def __check_files(self) -> None:
         # TODO: add recursive files if settings available 
@@ -104,8 +106,9 @@ class FileMover(QObject):
             "size":os.stat(src).st_size,
             "start_time": datetime.now()
         }
-        self.__movers.append(Mover(src, dst, self.__emit_finished_transfer, args=(data,)) )
-        self.__movers[-1].start()
+        mover =self.__movers.get_object()
+        mover.initialize(src, dst, self.__emit_finished_transfer, args=(data,))
+        mover.start()
 
     def __emit_finished_transfer(self, data: dict) -> None:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

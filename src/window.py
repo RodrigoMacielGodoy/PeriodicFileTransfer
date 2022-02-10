@@ -208,13 +208,13 @@ class MainWindow(QMainWindow):
 
         data = sorted(ext_total_size.items(), key=lambda x: x[1]/ext_count[x[0]])
         data.reverse()
-
+        self.bar_series.clear()
         for key,value in data:
             bar_set = QBarSet(key)
             bar_set.append(value/ext_count[key])
             self.bar_series.append(bar_set)
-        
-        self.bar_chart.addSeries(self.bar_series)
+        if not self.bar_series in self.bar_chart.series():
+            self.bar_chart.addSeries(self.bar_series)
 
     def swap_src_dst(self) -> None:
         dst, src = self.settings.source, self.settings.destination
