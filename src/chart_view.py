@@ -1,17 +1,19 @@
-from this import d
 from typing import Any
-from PyQt5.QtWidgets import QLabel, QGraphicsOpacityEffect, QSizePolicy
+
+from PyQt5.QtChart import QBarSet, QChart, QChartView, QLineSeries, QPieSlice
+from PyQt5.QtCore import QPoint, QPointF, QPropertyAnimation, QRect, Qt, QTimer
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtCore import QRect, QPoint, QPointF, QTimer, QPropertyAnimation, Qt
-from PyQt5.QtChart import QChartView, QPieSlice, QChart, QLineSeries, QBarSet
+from PyQt5.QtWidgets import QGraphicsOpacityEffect, QLabel
+
 
 class ChartView(QChartView):
-    def __init__(self, chart: QChart, series: Any):
+    def __init__(self, chart: QChart, series: Any=None):
         super().__init__(chart)
         self.setMouseTracking(True)
         self.cur_mouse_pos = QPoint(0,0)
         self.series = series
-        self.series.hovered.connect(self.__series_hovered)
+        if self.series is not None:
+            self.series.hovered.connect(self.__series_hovered)
         self.__label = QLabel()
         self.__label.setParent(self)
         self.__label.hide()
@@ -34,6 +36,13 @@ class ChartView(QChartView):
         self.__hide_timer.timeout.connect(self.__fade_anim.start)
         self.__show_label = False
         self.__label_offset = QPoint(10,10)
+
+    def set_series(self, series: list) -> None:
+        for serie in series:
+            serie.hovered.connect(self.__series_hovered)
+
+    def set_serie(self, serie) -> None:
+        serie.hovered.connect(self.__series_hovered)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         self.cur_mouse_pos = event.pos()
@@ -65,10 +74,9 @@ class ChartView(QChartView):
         if type(obj) is QPieSlice:
             self.__label.setText(f"{obj.percentage()*100.0:0.2f} %")
         elif type(obj) is QLineSeries:
-            pass
+            self.__label.setText(f"{obj.y():0.0f}")
         elif type(obj) is QBarSet:
             self.__label.setText(f"{obj.at(index):0.0f} bytes")
-            self
         else:
             self.__show_label = False
             return

@@ -1,16 +1,19 @@
 import os
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QLabel
-from PyQt5.QtGui import QIntValidator, QPainter, QColor
-from PyQt5.QtCore import Qt
-from PyQt5.QtChart import QPieSeries, QLineSeries, QBarSeries, QChart, QPieSlice, QBarSet
 from numpy import dtype
+from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet, QChart,
+                           QLineSeries, QPieSeries, QPieSlice, QChartView,
+                           QAbstractBarSeries, QStackedBarSeries)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QBrush, QColor, QIntValidator, QPainter
+from PyQt5.QtWidgets import QFileDialog, QLabel, QMainWindow, QTableWidgetItem
 
 from chart_view import ChartView
-from main_window_layout import Ui_MainWindow
-from settings import Settings, LOCAL_PATH, HOME_PATH
 from file_mover import FileMover
 from logger import Logger
+from main_window_layout import Ui_MainWindow
+from settings import HOME_PATH, LOCAL_PATH, Settings
+
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
@@ -60,52 +63,63 @@ class MainWindow(QMainWindow):
         self.ui.le_period.setValidator(QIntValidator(self.ui.le_period))
         self.lb_chart_hover = QLabel()
 
-        self.pie_chart = QChart()
         self.line_chart = QChart()
-        self.bar_chart = QChart()
 
-        # self.line_chart_view = QChartView(self.line_chart)
-
+        self.pie_chart = QChart()
         layout = self.pie_chart.layout()
         layout.setContentsMargins(0,0,0,0)
-
         self.pie_series = QPieSeries(self.pie_chart)
         self.pie_series.setPieSize(1)
-        self.pie_chart.legend().setLabelColor(QColor(255,255,255))
+        legend = self.pie_chart.legend()
+        legend.setLabelColor(QColor(230,230,230))
+        legend.setAlignment(Qt.AlignRight)
+        self.pie_chart.setTitle("Quantity of Transfers per Extension")
+        self.pie_chart.setTitleBrush(QBrush(QColor(255,255,255)))
         self.pie_chart.addSeries(self.pie_series)
         self.pie_chart.setBackgroundVisible(False)
         self.pie_chart_view = ChartView(self.pie_chart, self.pie_series)
-
-        # self.line_series = QLineSeries(self.line_chart)
-        # self.line_chart.addSeries(self.line_series)
-
-        self.bar_series = QBarSeries(self.bar_chart)
-        # self.bar_chart.addSeries(self.bar_series)
-        self.bar_chart.setBackgroundVisible(False)
-        self.bar_chart.legend().setLabelColor(QColor(255,255,255))
-        self.bar_chart_view = ChartView(self.bar_chart, self.bar_series)
-
         self.pie_chart_view.setRenderHint(QPainter.Antialiasing)
         self.pie_chart_view.setStyleSheet("""
                 background-color:transparent;
         """)
 
-        # self.line_chart_view.setRenderHint(QPainter.Antialiasing)
-        # self.line_chart_view.setStyleSheet("""
-        #         background-color:transparent;
-        # """)
+        self.bar_chart = QChart()
+        layout = self.bar_chart.layout()
+        layout.setContentsMargins(0,0,0,0)
 
+        self.bar_chart.setBackgroundVisible(False)
+        self.bar_series = QBarSeries()
+        legend = self.bar_chart.legend()
+        legend.setLabelColor(QColor(230,230,230))
+        legend.setAlignment(Qt.AlignBottom)
+        self.bar_chart.setTitle("Average File Size per Extension Transfered")
+        self.bar_chart.setTitleBrush(QBrush(QColor(255,255,255)))
+        self.bar_chart_view = ChartView(self.bar_chart, self.bar_series)
         self.bar_chart_view.setRenderHint(QPainter.Antialiasing)
         self.bar_chart_view.setStyleSheet("""
                 background-color:transparent;
         """)
 
+        self.line_chart = QChart()
+        layout = self.line_chart.layout()
+        layout.setContentsMargins(0,0,0,0)
+        self.line_series = QLineSeries(self.line_chart)
+        self.line_chart.setBackgroundVisible(False)
+        legend = self.line_chart.legend()
+        legend.setLabelColor(QColor(230,230,230))
+        legend.setAlignment(Qt.AlignBottom)
+        self.line_chart.setTitle("Files Transfered per Date")
+        self.line_chart.setTitleBrush(QBrush(QColor(255,255,255)))
+        self.line_chart_view = ChartView(self.line_chart, self.line_series)
+        self.line_chart_view.setRenderHint(QPainter.Antialiasing)
+        self.line_chart_view.setStyleSheet("""
+                background-color:transparent;
+        """)
+        
+        
         layout = self.ui.charts_tab.layout()
-
-        # TODO: Add chart titles!
-
         layout.addWidget(self.pie_chart_view, 0, 0, 1, 1)
-        # layout.addWidget(self.line_chart_view, 0, 1, 1, 1)
+        layout.addWidget(self.line_chart_view, 0, 1, 1, 1)
         layout.addWidget(self.bar_chart_view, 2, 0, 1, 2)
 
 
@@ -167,8 +181,6 @@ class MainWindow(QMainWindow):
                 self.ui.tableWidget.setItem(row, col, QTableWidgetItem(col_data))
 
     def update_charts(self) -> None:
-        # TODO: linechart -> Quantity of files moved each day/hour/minute (or something)
-
         log_data = self.file_logger.get_log()
 
         # Pie Chart - Quantity of files with same extension
@@ -191,8 +203,6 @@ class MainWindow(QMainWindow):
         self.pie_series.setLabelsVisible(True)
         self.pie_series.setLabelsPosition(QPieSlice.LabelInsideNormal)
 
-        # Line Chart - 
-
         # Bar Chart - Average file size per extension
         extension_sizes = [(row[3], row[6]) for row in log_data]
         ext_total_size = {}
@@ -206,15 +216,38 @@ class MainWindow(QMainWindow):
             ext_total_size[ext] += size
             ext_count[ext] += 1
 
-        data = sorted(ext_total_size.items(), key=lambda x: x[1]/ext_count[x[0]])
-        data.reverse()
+        data = sorted(ext_total_size.items(), key=lambda x: x[1]/ext_count[x[0]], reverse=True)
+
+        self.bar_chart.removeAllSeries()
         self.bar_series.clear()
         for key,value in data:
             bar_set = QBarSet(key)
             bar_set.append(value/ext_count[key])
+            bar_set.setLabelColor(QColor(230,230,230))
             self.bar_series.append(bar_set)
-        if not self.bar_series in self.bar_chart.series():
+        if self.bar_series not in self.bar_chart.series():
             self.bar_chart.addSeries(self.bar_series)
+
+        # Line Chart - Files moved per day
+
+        date_data = {}
+        for date in [row[0] for row in log_data]:
+            if date not in date_data:
+                date_data[date] = 0
+            date_data[date] += 1
+        
+        sorted_date_data = sorted(date_data.items(), key=lambda x: x[1], reverse=True)
+        
+        self.line_series.clear()
+        for i,pt in enumerate(sorted_date_data):
+            self.line_series.append(i, pt[1])
+        
+        if self.line_series not in self.line_chart.series():
+            self.line_chart.addSeries(self.line_series)
+            self.line_chart.createDefaultAxes()
+            axes = self.line_chart.axes()
+            for axis in axes:
+                axis.setLabelsColor(QColor(230,230,230))
 
     def swap_src_dst(self) -> None:
         dst, src = self.settings.source, self.settings.destination
