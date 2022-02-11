@@ -6,7 +6,7 @@ from PyQt5.QtChart import (QBarSeries, QBarSet, QChart, QDateTimeAxis,
                            QLineSeries, QPieSeries, QPieSlice)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor, QIntValidator, QPainter
-from PyQt5.QtWidgets import QFileDialog, QLabel, QMainWindow, QTableWidgetItem
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QTableWidgetItem, QHeaderView
 
 from chart_view import ChartView
 from file_mover import FileMover
@@ -61,7 +61,10 @@ class MainWindow(QMainWindow):
     def setupUI(self) -> None:
         self.ui.setupUi(self)
         self.ui.le_period.setValidator(QIntValidator(self.ui.le_period))
-        self.lb_chart_hover = QLabel()
+
+        column_header = self.ui.tableWidget.horizontalHeader()
+        column_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.tableWidget.setWordWrap(True)
 
         self.pie_chart = QChart()
         layout = self.pie_chart.layout()
@@ -184,11 +187,15 @@ class MainWindow(QMainWindow):
                 row_data = list(data.keys())
                 self.ui.tableWidget.setColumnCount(len(row_data))
                 for col, col_data in enumerate(row_data):
-                    self.ui.tableWidget.setItem(row, col, QTableWidgetItem(col_data))
+                    item = QTableWidgetItem(col_data)
+                    item.setTextAlignment(Qt.AlignCenter)
+                    self.ui.tableWidget.setItem(row, col, item)
             
             row_data = list(data.values())
             for col, col_data in enumerate(row_data):
-                self.ui.tableWidget.setItem(row+1, col, QTableWidgetItem(col_data))
+                item = QTableWidgetItem(col_data)
+                item.setTextAlignment(Qt.AlignCenter)
+                self.ui.tableWidget.setItem(row+1, col, item)
 
     def update_y_line_axis(self, min_: int, max_: int) -> None:
         self.line_chart.update()
@@ -198,7 +205,6 @@ class MainWindow(QMainWindow):
 
     def update_charts(self) -> None:
         log_data = self.file_logger.get_log()
-        # TODO: Make axis better for Pie Chart and more easy to visualize data in bar
         # TODO: Find a way to giver horizontal margins for data points for the Line Chart
         # Pie Chart - Quantity of files with same extension
         extensions = [row["Extension"] for row in log_data]
@@ -314,6 +320,9 @@ class MainWindow(QMainWindow):
         txt = "Stop" if running_state else "Start"
 
         self.ui.bt_start_stop.setText(txt)
+
+        style = self.styleSheet()
+        self.setStyleSheet(style)
 
     def regex_changed(self, txt: str) -> None:
         self.settings.setField("regex", txt)

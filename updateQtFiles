@@ -1,1 +1,2 @@
 pyuic5 ./UI/mainWindow.ui -o ./src/main_window_layout.py
+pyrcc5 UI/styleresources.qrc -o src/styleresources_rc.py

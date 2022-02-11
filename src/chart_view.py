@@ -10,10 +10,14 @@ class ChartView(QChartView):
     def __init__(self, chart: QChart, series: Any=None):
         super().__init__(chart)
         self.setMouseTracking(True)
+        self.__chart = chart
         self.cur_mouse_pos = QPoint(0,0)
+        self.__is_line_series = False
         self.series = series
         if self.series is not None:
             self.series.hovered.connect(self.__series_hovered)
+            self.__is_line_series = isinstance(series, QLineSeries)
+
         self.__label = QLabel()
         self.__label.setParent(self)
         self.__label.hide()
@@ -36,6 +40,7 @@ class ChartView(QChartView):
         self.__hide_timer.timeout.connect(self.__fade_anim.start)
         self.__show_label = False
         self.__label_offset = QPoint(10,10)
+        self.__last_mouse_pos = QPoint(0,0)
 
     def set_series(self, series: list) -> None:
         for serie in series:
@@ -46,11 +51,29 @@ class ChartView(QChartView):
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         self.cur_mouse_pos = event.pos()
-        if self.__show_label:
-            bot_right = self.cur_mouse_pos + QPoint(50,20)
+        if self.__show_label or self.__is_line_series:
             top_left = self.cur_mouse_pos + self.__label_offset
             self.__label.move(top_left)
+            if self.__is_line_series:
+                self.__opacity_effect.setOpacity(1.0)
+                if self.__label.isHidden():
+                    self.__label.show()
+                point = self.__chart.mapToValue(self.cur_mouse_pos)
+                self.__label.setText(f"{point.y():0.2f}")
+                self.__label.adjustSize()
         return super().mouseMoveEvent(event)
+
+    def enterEvent(self, a0) -> None:
+        if self.__hide_timer.isActive():
+            self.__hide_timer.stop()
+        self.__fade_anim.stop()
+        return super().enterEvent(a0)
+
+    def leaveEvent(self, a0) -> None:
+        if self.__hide_timer.isActive():
+            self.__hide_timer.stop()
+        self.__fade_anim.start()
+        return super().leaveEvent(a0)
 
     def faded(self) -> None:
         self.__label.hide()

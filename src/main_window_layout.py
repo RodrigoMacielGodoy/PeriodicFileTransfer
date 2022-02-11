@@ -14,11 +14,165 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(879, 666)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setStyleSheet("QWidget#centralWidget{\n"
-"    background-color: rgb(50, 50, 50);\n"
+        MainWindow.resize(879, 672)
+        MainWindow.setStyleSheet("QWidget{\n"
+"    color: white;\n"
+"    background-color:rgb(25, 35, 45);\n"
+"    border: 1px solid rgb(69, 83, 100);\n"
+"}\n"
+"\n"
+"QLabel{\n"
+"    border: 0;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QPushButton{\n"
+"    background-color: rgb(69, 83, 100);\n"
+"    border-radius: 4px;\n"
+"    border: 0;\n"
+"}\n"
+"\n"
+"QPushButton:pressed{\n"
+"    background-color: rgb(84, 104, 122);\n"
+"    border-radius: 4px;\n"
+"    border: 0;\n"
+"}\n"
+"\n"
+"QMainWindow > QWidget > QPushButton[text=\"Start\"]{\n"
+"    background-color:rgb(104, 149, 102);\n"
+"    min-width: 80px;\n"
+"    max-width: 80px;\n"
+"    min-height: 80px;\n"
+"    max-height: 80px;\n"
+"    border-radius: 40px;\n"
+"}\n"
+"\n"
+"QMainWindow > QWidget > QPushButton[text=\"Stop\"]{\n"
+"    background-color: rgb(181, 74, 74);\n"
+"    min-width: 80px;\n"
+"    max-width: 80px;\n"
+"    min-height: 80px;\n"
+"    max-height: 80px;\n"
+"    border-radius: 40px;\n"
+"}\n"
+"\n"
+"QTabWidget::pane{\n"
+"    border: 0px;\n"
+"}\n"
+"\n"
+"QTabWidget::tab-bar{\n"
+"    alignment: center;\n"
+"}\n"
+"\n"
+"QTabBar{\n"
+"    border: 0;\n"
+"}\n"
+"\n"
+"QTabBar::tab {\n"
+"    background-color: rgb(69, 83, 100);\n"
+"    border: 0;\n"
+"    border-radius: 4px;\n"
+"    margin: 2px;\n"
+"    min-width: 10ex;\n"
+"    min-height: 5ex;\n"
+"    padding: 2px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:selected, QTabBar::tab:selected:hover{\n"
+"    background:qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:1, stop:0.681818 rgba(84, 104, 122, 255), stop:0.7 rgba(52, 64, 216, 255));\n"
+"    margin-bottom: 0;\n"
+"    border-bottom-right-radius: 0px;\n"
+"    border-bottom-left-radius: 0px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:hover {\n"
+"    background-color: rgb(84, 104, 122);\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected {\n"
+"    margin: 2px;\n"
+"}\n"
+"\n"
+"QScrollBar{\n"
+"    border: 0;\n"
+"    background: rgb(69, 83, 100);\n"
+"    height: 3ex;\n"
+"}\n"
+"\n"
+"QScrollBar::handle {\n"
+"    background: rgb(84, 104, 122);\n"
+"    min-width: 20px;\n"
+"}\n"
+"\n"
+"QTableWidget {\n"
+"    gridline-color: rgb(84, 104, 122);\n"
+"    selection-background-color: rgb(84, 104, 122);\n"
+"}\n"
+"\n"
+"QHeaderView::section {\n"
+"    background-color: rgb(84, 104, 122);\n"
+"    border-style: none;\n"
+"    border-bottom: 1px solid white;\n"
+"}\n"
+"\n"
+"QComboBox {\n"
+"    border: 1px solid rgb(84, 104, 122);\n"
+"    border-radius: 4px;\n"
+"    background-color: rgb(84, 104, 122);\n"
+"}\n"
+"\n"
+"QComboBox:on {\n"
+"    padding-top: 3px;\n"
+"    padding-left: 4px;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top right;\n"
+"    min-width: 24px;\n"
+"    border-left-width: 1px;\n"
+"    border-left-color:rgb(69, 83, 100);\n"
+"    border-left-style: solid;\n"
+"    border-top-right-radius: 3px;\n"
+"    border-bottom-right-radius: 3px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:on {\n"
+"    top: 1px;\n"
+"    left: 1px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow {\n"
+"    image: url(:/Icons/arrow-down-outline.svg);\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView {\n"
+"    border: 1px solid rgb(69, 83, 100);\n"
+"    selection-background-color: rgb(84, 104, 122);\n"
+"}\n"
+"\n"
+"QLineEdit {\n"
+"    selection-background-color: rgb(84, 104, 122);\n"
+"}\n"
+"\n"
+"\n"
+"QWidget:disabled{\n"
+"    color: rgb(85, 104, 124);\n"
+"}\n"
+"\n"
+"QPushButton:disabled{\n"
+"    background-color: rgb(34, 41, 49);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled{\n"
+"    background-color: rgb(34, 41, 49);\n"
+"}\n"
+"\n"
+"QComboBox:disabled{\n"
+"    background-color: rgb(34, 41, 49);\n"
 "}")
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setStyleSheet("")
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -29,16 +183,7 @@ class Ui_MainWindow(object):
         self.bt_start_stop = QtWidgets.QPushButton(self.centralwidget)
         self.bt_start_stop.setMinimumSize(QtCore.QSize(80, 80))
         self.bt_start_stop.setMaximumSize(QtCore.QSize(80, 80))
-        self.bt_start_stop.setStyleSheet("QPushButton{\n"
-"    color:black;\n"
-"    background-color:rgb(129, 129, 129);\n"
-"    border-radius: 40px;\n"
-"    border: 1px solid white;\n"
-"}\n"
-"\n"
-"QPushButton:pressed{\n"
-"    border: none;\n"
-"}")
+        self.bt_start_stop.setStyleSheet("")
         self.bt_start_stop.setObjectName("bt_start_stop")
         self.horizontalLayout_3.addWidget(self.bt_start_stop)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -60,6 +205,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.lb_file_regex = QtWidgets.QLabel(self.config_tab)
+        self.lb_file_regex.setEnabled(True)
         self.lb_file_regex.setObjectName("lb_file_regex")
         self.horizontalLayout_5.addWidget(self.lb_file_regex)
         self.le_file_regex = QtWidgets.QLineEdit(self.config_tab)
@@ -73,10 +219,13 @@ class Ui_MainWindow(object):
         self.lb_period.setObjectName("lb_period")
         self.horizontalLayout.addWidget(self.lb_period)
         self.le_period = QtWidgets.QLineEdit(self.config_tab)
+        self.le_period.setEnabled(True)
         self.le_period.setAlignment(QtCore.Qt.AlignCenter)
         self.le_period.setObjectName("le_period")
         self.horizontalLayout.addWidget(self.le_period)
         self.cb_period_unit = QtWidgets.QComboBox(self.config_tab)
+        self.cb_period_unit.setEnabled(True)
+        self.cb_period_unit.setMinimumSize(QtCore.QSize(120, 0))
         self.cb_period_unit.setObjectName("cb_period_unit")
         self.cb_period_unit.addItem("")
         self.cb_period_unit.addItem("")
@@ -139,7 +288,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -159,3 +308,4 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.config_tab), _translate("MainWindow", "Configurations"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.charts_tab), _translate("MainWindow", "Statistics"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.logging_tab), _translate("MainWindow", "Logs"))
+import styleresources_rc

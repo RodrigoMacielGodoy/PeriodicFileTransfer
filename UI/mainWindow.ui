@@ -7,17 +7,173 @@
     <x>0</x>
     <y>0</y>
     <width>879</width>
-    <height>666</height>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Periodic File Transfer</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+	color: white;
+	background-color:rgb(25, 35, 45);
+    border: 1px solid rgb(69, 83, 100);
+}
+
+QLabel{
+	border: 0;
+	background-color: transparent;
+}
+
+QPushButton{
+	background-color: rgb(69, 83, 100);
+	border-radius: 4px;
+    border: 0;
+}
+
+QPushButton:pressed{
+	background-color: rgb(84, 104, 122);
+	border-radius: 4px;
+    border: 0;
+}
+
+QMainWindow &gt; QWidget &gt; QPushButton[text=&quot;Start&quot;]{
+	background-color:rgb(104, 149, 102);
+	min-width: 80px;
+	max-width: 80px;
+	min-height: 80px;
+	max-height: 80px;
+	border-radius: 40px;
+}
+
+QMainWindow &gt; QWidget &gt; QPushButton[text=&quot;Stop&quot;]{
+	background-color: rgb(181, 74, 74);
+	min-width: 80px;
+	max-width: 80px;
+	min-height: 80px;
+	max-height: 80px;
+	border-radius: 40px;
+}
+
+QTabWidget::pane{
+    border: 0px;
+}
+
+QTabWidget::tab-bar{
+	alignment: center;
+}
+
+QTabBar{
+	border: 0;
+}
+
+QTabBar::tab {
+    background-color: rgb(69, 83, 100);
+    border: 0;
+	border-radius: 4px;
+	margin: 2px;
+    min-width: 10ex;
+	min-height: 5ex;
+    padding: 2px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:selected:hover{
+    background:qlineargradient(spread:pad, x1:0.5, y1:0.5, x2:0.5, y2:1, stop:0.681818 rgba(84, 104, 122, 255), stop:0.7 rgba(52, 64, 216, 255));
+	margin-bottom: 0;
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+QTabBar::tab:hover {
+	background-color: rgb(84, 104, 122);
+}
+
+QTabBar::tab:!selected {
+    margin: 2px;
+}
+
+QScrollBar{
+    border: 0;
+    background: rgb(69, 83, 100);
+    height: 3ex;
+}
+
+QScrollBar::handle {
+    background: rgb(84, 104, 122);
+    min-width: 20px;
+}
+
+QTableWidget {
+    gridline-color: rgb(84, 104, 122);
+	selection-background-color: rgb(84, 104, 122);
+}
+
+QHeaderView::section {
+    background-color: rgb(84, 104, 122);
+    border-style: none;
+    border-bottom: 1px solid white;
+}
+
+QComboBox {
+    border: 1px solid rgb(84, 104, 122);
+    border-radius: 4px;
+	background-color: rgb(84, 104, 122);
+}
+
+QComboBox:on {
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: margin;
+    subcontrol-position: top right;
+    min-width: 24px;
+    border-left-width: 1px;
+    border-left-color:rgb(69, 83, 100);
+    border-left-style: solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow:on {
+    top: 1px;
+    left: 1px;
+}
+
+QComboBox::down-arrow {
+	image: url(:/Icons/arrow-down-outline.svg);
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid rgb(69, 83, 100);
+    selection-background-color: rgb(84, 104, 122);
+}
+
+QLineEdit {
+    selection-background-color: rgb(84, 104, 122);
+}
+
+
+QWidget:disabled{
+    color: rgb(85, 104, 124);
+}
+
+QPushButton:disabled{
+	background-color: rgb(34, 41, 49);
+}
+
+QLineEdit:disabled{
+    background-color: rgb(34, 41, 49);
+}
+
+QComboBox:disabled{
+    background-color: rgb(34, 41, 49);
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true">QWidget#centralWidget{
-	background-color: rgb(50, 50, 50);
-}</string>
+    <string notr="true"/>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
@@ -50,16 +206,7 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton{
-	color:black;
-	background-color:rgb(129, 129, 129);
-	border-radius: 40px;
-	border: 1px solid white;
-}
-
-QPushButton:pressed{
-	border: none;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Start</string>
@@ -90,7 +237,7 @@ QPushButton:pressed{
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="config_tab">
        <attribute name="title">
@@ -129,6 +276,9 @@ QPushButton:pressed{
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
              <widget class="QLabel" name="lb_file_regex">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="text">
                <string>Expression to be matched:</string>
               </property>
@@ -154,6 +304,9 @@ QPushButton:pressed{
             </item>
             <item>
              <widget class="QLineEdit" name="le_period">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
@@ -161,6 +314,15 @@ QPushButton:pressed{
             </item>
             <item>
              <widget class="QComboBox" name="cb_period_unit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
               <item>
                <property name="text">
                 <string>Seconds</string>
@@ -322,6 +484,8 @@ QPushButton:pressed{
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="styleresources.qrc"/>
+ </resources>
  <connections/>
 </ui>
