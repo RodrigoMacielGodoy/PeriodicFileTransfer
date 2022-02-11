@@ -7,13 +7,18 @@
     <x>0</x>
     <y>0</y>
     <width>879</width>
-    <height>664</height>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Periodic File Transfer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QWidget#centralWidget{
+	background-color: rgb(50, 50, 50);
+}</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -85,7 +90,7 @@ QPushButton:pressed{
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="config_tab">
        <attribute name="title">
@@ -305,46 +310,9 @@ QPushButton:pressed{
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
-          <column>
-           <property name="text">
-            <string>Date</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Time</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>File Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Extension</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Source</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Destination</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Size [bytes]</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Transfer Time [us]</string>
-           </property>
-          </column>
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
          </widget>
         </item>
        </layout>

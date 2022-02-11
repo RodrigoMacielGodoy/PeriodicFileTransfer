@@ -1,9 +1,9 @@
 import os
+from datetime import datetime
 
 from numpy import dtype
-from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet, QChart,
-                           QLineSeries, QPieSeries, QPieSlice, QChartView,
-                           QAbstractBarSeries, QStackedBarSeries)
+from PyQt5.QtChart import (QBarSeries, QBarSet, QChart, QDateTimeAxis,
+                           QLineSeries, QPieSeries, QPieSlice)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor, QIntValidator, QPainter
 from PyQt5.QtWidgets import QFileDialog, QLabel, QMainWindow, QTableWidgetItem
@@ -63,8 +63,6 @@ class MainWindow(QMainWindow):
         self.ui.le_period.setValidator(QIntValidator(self.ui.le_period))
         self.lb_chart_hover = QLabel()
 
-        self.line_chart = QChart()
-
         self.pie_chart = QChart()
         layout = self.pie_chart.layout()
         layout.setContentsMargins(0,0,0,0)
@@ -101,9 +99,12 @@ class MainWindow(QMainWindow):
         """)
 
         self.line_chart = QChart()
+        self.line_x_axis = QDateTimeAxis()
+        self.line_x_axis.setFormat("dd/MM")
         layout = self.line_chart.layout()
         layout.setContentsMargins(0,0,0,0)
         self.line_series = QLineSeries(self.line_chart)
+        self.line_series.setPointsVisible(True)
         self.line_chart.setBackgroundVisible(False)
         legend = self.line_chart.legend()
         legend.setLabelColor(QColor(230,230,230))
@@ -174,17 +175,33 @@ class MainWindow(QMainWindow):
 
     def update_log_table(self) -> None:
         log_data = self.file_logger.get_log()
-        self.ui.tableWidget.setRowCount(0)
-        self.ui.tableWidget.setRowCount(len(log_data))
-        for row, row_data in enumerate(log_data):
+        self.ui.tableWidget.clear()
+        self.ui.tableWidget.setRowCount(len(log_data)+1)
+        first = True
+        for row, data in enumerate(log_data):
+            if first:
+                first = False
+                row_data = list(data.keys())
+                self.ui.tableWidget.setColumnCount(len(row_data))
+                for col, col_data in enumerate(row_data):
+                    self.ui.tableWidget.setItem(row, col, QTableWidgetItem(col_data))
+            
+            row_data = list(data.values())
             for col, col_data in enumerate(row_data):
-                self.ui.tableWidget.setItem(row, col, QTableWidgetItem(col_data))
+                self.ui.tableWidget.setItem(row+1, col, QTableWidgetItem(col_data))
+
+    def update_y_line_axis(self, min_: int, max_: int) -> None:
+        self.line_chart.update()
+        y_axis = self.line_chart.axisY()
+        if y_axis:
+            y_axis.setRange(min_, max_)
 
     def update_charts(self) -> None:
         log_data = self.file_logger.get_log()
-
+        # TODO: Make axis better for Pie Chart and more easy to visualize data in bar
+        # TODO: Find a way to giver horizontal margins for data points for the Line Chart
         # Pie Chart - Quantity of files with same extension
-        extensions = [row[3] for row in log_data]
+        extensions = [row["Extension"] for row in log_data]
         pie_data = {}
 
         for ext in extensions:
@@ -204,7 +221,7 @@ class MainWindow(QMainWindow):
         self.pie_series.setLabelsPosition(QPieSlice.LabelInsideNormal)
 
         # Bar Chart - Average file size per extension
-        extension_sizes = [(row[3], row[6]) for row in log_data]
+        extension_sizes = [(row["Extension"], row["Size [bytes]"]) for row in log_data]
         ext_total_size = {}
         ext_count = {}
         for pt in extension_sizes:
@@ -218,7 +235,6 @@ class MainWindow(QMainWindow):
 
         data = sorted(ext_total_size.items(), key=lambda x: x[1]/ext_count[x[0]], reverse=True)
 
-        self.bar_chart.removeAllSeries()
         self.bar_series.clear()
         for key,value in data:
             bar_set = QBarSet(key)
@@ -231,20 +247,28 @@ class MainWindow(QMainWindow):
         # Line Chart - Files moved per day
 
         date_data = {}
-        for date in [row[0] for row in log_data]:
+        for date in [row["Date"] for row in log_data]:
             if date not in date_data:
                 date_data[date] = 0
             date_data[date] += 1
         
-        sorted_date_data = sorted(date_data.items(), key=lambda x: x[1], reverse=True)
+        sorted_date_data = sorted(date_data.items(), 
+                                  key=lambda x: datetime.strptime(x[0], "%Y-%m-%d"))
         
         self.line_series.clear()
+        self.line_x_axis.setTickCount(len(sorted_date_data))
+        self.line_x_axis.setMin(datetime.strptime(sorted_date_data[0][0], "%Y-%m-%d"))
+        self.line_x_axis.setMax(datetime.strptime(sorted_date_data[-1][0], "%Y-%m-%d"))
+        values = [d[1] for d in sorted_date_data]
         for i,pt in enumerate(sorted_date_data):
             self.line_series.append(i, pt[1])
+
+        self.update_y_line_axis(min(values)-1, max(values)+1)
         
         if self.line_series not in self.line_chart.series():
             self.line_chart.addSeries(self.line_series)
             self.line_chart.createDefaultAxes()
+            self.line_chart.setAxisX(self.line_x_axis)
             axes = self.line_chart.axes()
             for axis in axes:
                 axis.setLabelsColor(QColor(230,230,230))

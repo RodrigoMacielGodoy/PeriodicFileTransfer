@@ -100,10 +100,10 @@ class FileMover(QObject):
         # giving the option to cancel the move cmd and preventing corruption
         # of files if application is forced to close.
         data = {
-            "src":self.__source,
-            "dst":self.__destination,
+            "Source":self.__source,
+            "Destination":self.__destination,
             "file":file,
-            "size":os.stat(src).st_size,
+            "Size [bytes]":os.stat(src).st_size,
             "start_time": datetime.now()
         }
         mover =self.__movers.get_object()
@@ -112,9 +112,18 @@ class FileMover(QObject):
 
     def __emit_finished_transfer(self, data: dict) -> None:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_date, now_hour = now.split(" ")
+        transfer_time = (datetime.now() - data["start_time"]).microseconds
+        file_name, ext = os.path.splitext(data["file"])
         new_data = {
-            "transfer_time": (datetime.now() - data["start_time"]).microseconds,
-            "end_time": now
+            "Date": now_date,
+            "Hour": now_hour,
+            "File Name": file_name,
+            "Extension": ext,
+            "Transfer Time [us]": transfer_time
         }
+        data.pop("start_time")
+        data.pop("file")
         data.update(new_data)
+        
         self.fileTransfered.emit(data)
