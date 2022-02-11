@@ -1,5 +1,5 @@
 # Periodic File Auto Transfer
-A software capable of periodicly tranfer files from a source folder to a destination folder based on regular expression matches of files.
+A software capable of periodicly tranfering files from a source folder to a destination folder based on regular expression matches of file name.
 
 # Features
 
@@ -12,6 +12,7 @@ A software capable of periodicly tranfer files from a source folder to a destina
 
 # Requirements
 
+- Tested on Windows 7 x64 and Max OS Catalina (Should run fine in Linux systems too)
 - Python >= 3.7 (with pip)
 
 # How to Run Source Code
