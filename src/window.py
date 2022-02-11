@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
 
-from numpy import dtype
 from PyQt5.QtChart import (QBarSeries, QBarSet, QChart, QDateTimeAxis,
                            QLineSeries, QPieSeries, QPieSlice)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor, QIntValidator, QPainter
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import (QAbstractItemView, QFileDialog, QHeaderView,
+                             QMainWindow, QTableWidgetItem)
 
 from chart_view import ChartView
 from file_mover import FileMover
@@ -65,6 +65,8 @@ class MainWindow(QMainWindow):
         column_header = self.ui.tableWidget.horizontalHeader()
         column_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         self.ui.tableWidget.setWordWrap(True)
+        self.ui.tableWidget.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.ui.tableWidget.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
         self.pie_chart = QChart()
         layout = self.pie_chart.layout()
@@ -178,6 +180,8 @@ class MainWindow(QMainWindow):
 
     def update_log_table(self) -> None:
         log_data = self.file_logger.get_log()
+        if len(log_data) == 0:
+            return
         self.ui.tableWidget.clear()
         self.ui.tableWidget.setRowCount(len(log_data)+1)
         first = True
@@ -205,6 +209,8 @@ class MainWindow(QMainWindow):
 
     def update_charts(self) -> None:
         log_data = self.file_logger.get_log()
+        if len(log_data) == 0:
+            return
         # TODO: Find a way to giver horizontal margins for data points for the Line Chart
         # Pie Chart - Quantity of files with same extension
         extensions = [row["Extension"] for row in log_data]
@@ -249,6 +255,7 @@ class MainWindow(QMainWindow):
             self.bar_series.append(bar_set)
         if self.bar_series not in self.bar_chart.series():
             self.bar_chart.addSeries(self.bar_series)
+        self.bar_chart.update()
 
         # Line Chart - Files moved per day
 
